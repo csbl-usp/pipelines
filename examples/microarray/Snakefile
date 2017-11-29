@@ -1,0 +1,17 @@
+from box import Box
+configfile: "config.yaml"
+config = Box(config)
+
+rule all:
+    input: expand("results/{study}", study=config.data.geo.studies)
+
+
+rule bootstrap:
+    output: "raw", "intermediate", "results"
+    shell: "mkdir {output}"
+
+
+rule process:
+    input: rules.bootstrap.output
+    output: "results/{study}"
+    shell: "mkdir {output}"

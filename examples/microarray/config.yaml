@@ -1,0 +1,6 @@
+---
+type: "microarray"
+data:
+    geo:
+        studies: ['A','B','C','D']
+
