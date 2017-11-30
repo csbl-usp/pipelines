@@ -1,17 +1,61 @@
 from box import Box
+
 configfile: "config.yaml"
 config = Box(config)
 
 rule all:
     input: expand("results/{study}", study=config.data.geo.studies)
 
-
 rule bootstrap:
+    # Creates all directories for current analysis
     output: "raw", "intermediate", "results"
     shell: "mkdir {output}"
 
-
-rule process:
+rule download:
+    # Download studies from GEO database
     input: rules.bootstrap.output
-    output: "results/{study}"
-    shell: "mkdir {output}"
+    output: "raw/{study}"
+    message: f"Downloading study {study}"
+    wrapper: "file://../steps/data/geo"
+
+rule normalize:
+    # Normalize microarray data
+    input: rules.download.output
+    output: "intermediate/{study}/normalized.tsv"
+    message: f"Normalizing study {study}"
+    wrapper: "file://../steps/normalization/quantile"
+
+rule qc:
+    # Run arrayQualityMetrics
+    input: rules.normalize.output
+    output: "intermediate/{study}/qc"
+    message: f"Quality control of study {study}"
+    wrapper: "file://../steps/qc/aqm"
+
+rule deg:
+    # Run DEG analysis w/ limma
+    input: rules.normalize.output
+    output: "results/{study}/deg"
+    message: f"Differentially expressed genes for study {study}"
+    wrapper: "file://../steps/degs/limma"
+
+rule gsea:
+    # Run GSEA analysis
+    input: rules.normalize.output
+    output: "results/{study}/gsea"
+    message: f"Gene set enrichment analysis for study {study}"
+    wrapper: "file://../steps/functional/gsea"
+
+rule ora:
+    # Run ORA analysis
+    input: rules.normalize.output
+    output: "results/{study}/ora"
+    message: f"Over representation analysis for study {study}"
+    wrapper: "file://../steps/functional/ora"
+
+rule cemitool:
+    # Run CEMiTool analysis
+    input: rules.normalize.output
+    output: "results/{study}/cemitool"
+    message: f"CEMiTool analysis for study {study}"
+    wrapper: "file://../steps/coexpression/cemitool"
