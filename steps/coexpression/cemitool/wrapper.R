@@ -1,7 +1,7 @@
 input <- list()
 
 # Check input files
-if (!is.null(snakemake@input[["sample_annotation"]])) {
+if (!is.null(snakemake@input[["expression"]])) {
     expression <- readr::read_tsv(snakemake@input[["expression"]])
     expression <- as.data.frame(expression)
     rownames(expression) <- expression[,"ID"]
