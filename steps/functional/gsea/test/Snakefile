@@ -1,0 +1,10 @@
+rule gsea:
+    input:
+        ranks = "ranks.tsv",
+        gmt = "pathways.gmt"
+    output: "gsea.tsv"
+    params:
+        nperm = 1000,
+        minSize = 1,
+        sort_by = "logFC"
+    wrapper:"file://.."
