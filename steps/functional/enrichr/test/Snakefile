@@ -1,0 +1,7 @@
+rule enrichr:
+    input:
+        genelists = "genelists.gmt"
+    params:
+        databases = ["Disease_Perturbations_from_GEO_down",
+                     "Disease_Perturbations_from_GEO_up"]
+    wrapper: "file://.."
