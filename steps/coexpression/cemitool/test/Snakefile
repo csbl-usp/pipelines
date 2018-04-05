@@ -1,0 +1,7 @@
+rule cemitool:
+    input:
+        expression = "expression.tsv"
+    params:
+        filter = False,
+        verbose = False
+    wrapper: "file://.."
