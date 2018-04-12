@@ -8,13 +8,13 @@
 #' @param pv_cutoff P-value cutoff.
 #' @param fc_cutoff Fold change cutoff.
 #' @return List of up and down regulated genes for each comparison.
-degs2list <- function(tb, gene_col='gene', fc_col='logfc', 
-                        pv_col='adjpval', comp_col='comparison',
-                        pv_cutoff=0.1, fc_cutoff=0) {
-    tb <- tb[which(tb[[gene_col]] != ""), ]
-    up <- tb[which(tb[[logfc_col]] > logfc & tb[[p_value_col]] < p_value), gene_col]
-    down <- tb[which(tb[[logfc_col]] < -logfc & tb[[p_value_col]] < p_value), gene_col]
-    name <- unique(tb[[nm_col]])
+degs2list <- function(degs, gene_col='gene', fc_col='logfc', 
+                      pv_col='adjpval', comp_col='comparison',
+                      pv_cutoff=0.1, fc_cutoff=0) {
+    degs <- degs[which(degs[[gene_col]] != ""), ]
+    up <- degs[which(degs[[fc_col]] > fc_cutoff & degs[[pv_col]] < pv_cutoff), gene_col]
+    down <- degs[which(degs[[fc_col]] < -fc_cutoff & degs[[pv_col]] < pv_cutoff), gene_col]
+    name <- unique(degs[[comp_col]])
     results <- list(up, down)
     names(results) <- c(paste0(name, "_up"), paste0(name, "_down"))
     return(results)
@@ -31,18 +31,19 @@ list2gmt <- function(degs_list) {
         result <- c(deg, rep("", dif))
     })
     results <- do.call('rbind', results)
-    results <- cbind(names(tb), results)
+    results <- cbind(names(degs_list), results)
     return(results)
 }
 
 # Get file path and parameters
 degs_file <- snakemake@input[["degs"]]
 params <- snakemake@params
+params <- params[names(params) != ""]
 
 # Read DEGs table and transform into GMT
 degs <- read.csv(file=degs_file, header=TRUE, stringsAsFactors=FALSE)
 
-gps <- unique(degs[, ifelse(is.null(params[["group"]], "group", params[["group"]]))])
+gps <- unique(degs[, ifelse(is.null(params[["group"]]), "group", params[["group"]])])
 all_groups <- lapply(gps, function(gp){
     df <- degs[which(degs$group == gp),]
     params[["degs"]] <- df
