@@ -1,0 +1,13 @@
+rule degs2gmt:
+    input:
+       degs = "degs.csv"
+    output:
+        output = "degs.gmt"
+    params:
+        gene_col = "HGNC.symbol",
+        logfc_col = "log2FoldChange",
+        p_value_col = "padj",
+        p_value = 0.1,
+        logfc = 0,
+        nm_col = "group"
+    wrapper: "file:///home/fabiopohl/snakemake/pipelines/steps/convert/degs2gmt/"
