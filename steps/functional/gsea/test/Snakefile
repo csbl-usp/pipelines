@@ -4,6 +4,8 @@ rule gsea:
         gmt = "pathways.gmt"
     output: "gsea.tsv"
     params:
+        gene_col = "ID",
+        comp_col = "group",
         nperm = 1000,
         minSize = 1,
         sort_by = "logFC"
